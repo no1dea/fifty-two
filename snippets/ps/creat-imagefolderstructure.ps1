@@ -15,7 +15,7 @@ foreach ($Pic in $Pictures) {
         continue
     }
     Write-Host "Picture was taken in Week $cw"
-    $pf = Join-Path -Path $BasePath -ChildPath images -AdditionalChildPath "week $cw"
+    $pf = Join-Path -Path $BasePath -ChildPath "static" -AdditionalChildPath "images\week $cw"
     if (Test-Path -Path $pf) {
         if (Test-Path -Path $(Join-Path -Path $pf -ChildPath "*")) { 
             Write-Host "Folder $pf already contains pictures!"
