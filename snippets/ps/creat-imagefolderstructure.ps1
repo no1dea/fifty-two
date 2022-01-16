@@ -6,6 +6,11 @@
 $BasePath = "D:\github\fifty-two"
 $Pictures = Get-ChildItem -Path $( Join-Path -Path $BasePath -ChildPath "src\pics\*" ) -Include *.jpg
 
+if (!($Pictures)) {
+    Write-Host "No pictures to process."
+    Write-Host "Exiting."
+ }
+
 foreach ($Pic in $Pictures) {
     #Get creation time
     $cw = $Pic.LastWriteTime | Get-Date -Uformat %V
