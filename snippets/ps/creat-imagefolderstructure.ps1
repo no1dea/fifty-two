@@ -6,20 +6,34 @@
 $BasePath = "D:\github\fifty-two"
 $Pictures = Get-ChildItem -Path $( Join-Path -Path $BasePath -ChildPath "src\pics\*" ) -Include *.jpg
 
+$Shell = New-Object -ComObject Shell.Application
+$ShellFolder = $Shell.Namespace($( Join-Path -Path $BasePath -ChildPath "src\pics" ))
+#source: https://blog.jongallant.com/2021/03/organize-photos-powershell/
+
 if (!($Pictures)) {
     Write-Host "No pictures to process."
     Write-Host "Exiting."
  }
 
 foreach ($Pic in $Pictures) {
+    #Create the File Object for the file property enumeration
+    $ShellFile = $ShellFolder.ParseName($($Pic.Name))
+   
     #Get creation time
-    $cw = $Pic.LastWriteTime | Get-Date -Uformat %V
+    $exifDateTaken = ($ShellFolder.GetDetailsOf($ShellFile,12) -replace "`u{200e}") -replace "`u{200f}"
+    if ($exifDateTaken) {
+        $cw = $exifDateTaken | Get-Date -Uformat %V 
+        } else {
+        Write-Host "Could not get exif informations of $Pic.Name. Using the LastWriteTime."
+        $cw = $Pic.LastWriteTime | Get-Date -Uformat %V
+    }
     # Check if a week number even exists
     if (!$cw) {
         Write-Host "Could not get the week number of $Pic.Name"
         continue
     }
-    Write-Host "Picture was taken in Week $cw"
+
+    Write-Host "Picture $Pic was taken in Week $cw"
     $pf = Join-Path -Path $BasePath -ChildPath "static" -AdditionalChildPath "images\week $cw"
     if (Test-Path -Path $pf) {
         if (Test-Path -Path $(Join-Path -Path $pf -ChildPath "*")) { 
